@@ -15,7 +15,7 @@ else:
             if IPv4Address('240.0.0.0') <= IPv4Address(a) <= IPv4Address('255.255.255.255'):
                 print('Has introducido una dirección broadcast.')
             else:
-                if IPv4Address('1.0.0.0') <= IPv4Address(a) <= IPv4Address('126.255.255.255'):
+                if IPv4Address('1.0.0.0') <= IPv4Address(a) <= IPv4Address('127.255.255.255'):
                     print('Has introducido una dirección IPv4 de clase A.')
                     print('Puede tener hasta 16777214 hosts.')
                 else:
