@@ -1,5 +1,5 @@
 import ipaddress
-
+#Hecho por: StaryDark    Telegram:@dark_zly
 ip = ipaddress.IPv4Address(input("Introduce ipv4: "))
 #ip_max es la ip maxima que puede llegar una ip
 ip_max = 2147483647 #(formato int)2147483647 = (formato ip)127.255.255.255
