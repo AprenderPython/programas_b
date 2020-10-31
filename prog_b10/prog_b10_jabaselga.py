@@ -33,6 +33,7 @@ chrome & chromedriver to use selenium
 
 from gazpacho import get, Soup
 import re
+import json
 
 # para usar selenium
 try:
@@ -84,12 +85,37 @@ def paser_selenium (page):
 
     return nombre, tipo
 
-def comprobar_estado(usuario, sl):
+def comprobar_estado_json(page, user):
+    patron=re.compile(r"window._sharedData\s+=\s+(\{.*?});</script>")
+    p=patron.search(page)
+    data=json.loads(p.group(1))
+    nombre = data['entry_data']['ProfilePage'][0]['graphql']['user']['full_name']
+    seguidores = data['entry_data']['ProfilePage'][0]['graphql']['user']['edge_followed_by']['count']
+    seguidores = f'{seguidores} seguidores'
+    seguidos = data['entry_data']['ProfilePage'][0]['graphql']['user']['edge_follow']['count'] 
+    seguidos = f'{seguidos} seguidos'
+    publicaciones = data['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['count'] 
+    publicaciones = f'{publicaciones} publicaciones'
+    if data['entry_data']['ProfilePage'][0]['graphql']['user']['is_private']:
+        tipo="Esta cuenta es privada"
+    else:
+        tipo="Esta cuenta es pública"
+
+    user=f'@{user}'
+
+    return user, nombre, seguidores, seguidos, publicaciones, tipo
+
+
+def existe_usuario(usuario):
     url_user=url+usuario+'/?hl=es'
     try:
         html=get(url_user)
     except:
         return None
+    
+    return html
+
+def comprobar_estado_sl(html, user, sl):
 
     html_s=Soup(html)
     a=html_s.find('meta', attrs={'property':'og:description'})
@@ -114,6 +140,7 @@ def comprobar_estado(usuario, sl):
         usuario = usuario[1:-1]
 
     if sl:
+        url_user=url+usuario+'/?hl=es'
         nombre, tipo=paser_selenium(url_user)
     else:
         nombre, tipo='¿nombre?','No tienes selenium instaldo, imposible sacar el tipo cuenta...'
@@ -132,10 +159,18 @@ def imprimir_datos(usuario, nombre, seguidores, seguidos, publicaciones, tipo):
 if __name__ == "__main__":
     
     user=pedir_usuario()
-    try:
-        usuario, nombre, seguidores, seguidos, publicaciones, tipo = comprobar_estado(user, sl)
+    page=existe_usuario(user)
+    if page:
+        
+        usuario, nombre, seguidores, seguidos, publicaciones, tipo = comprobar_estado_sl(page, user, sl)
         imprimir_datos(usuario, nombre, seguidores, seguidos, publicaciones, tipo)
-    except TypeError:
+
+        print('\n\nAhora con json:')
+        usuario, nombre, seguidores, seguidos, publicaciones, tipo = comprobar_estado_json(page, user)
+        imprimir_datos(usuario, nombre, seguidores, seguidos, publicaciones, tipo)
+            
+        
+    else:
         print ("El usuario no existe..")
-    
+        
     print ("Fin del juego".center(40, "*"))
