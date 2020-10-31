@@ -16,7 +16,7 @@ Si existe debe mostrar los siguientes datos de forma ordenada:
 '''
 
 # Uso expresiones regulares para validar la entrada del usuario y luego para
-# poder quedarme con el fragmento de código fuente de la página de instragram
+# poder quedarme con el fragmento de código fuente de la página de instagram
 # donde están los datos que necesito
 import re
 
@@ -25,9 +25,8 @@ import re
 import requests
 
 # Uso la librería json para mapear el código script de la página de instagram
-# y poder acceder en forma más fácil a los dato que necesito obtener
+# y poder acceder en forma más fácil a los datos que necesito obtener
 import json
-
 
 
 def obtengo_datos(pagina):
@@ -42,11 +41,11 @@ def obtengo_datos(pagina):
     if texto_capturado:
         
         # Convierto el texto de la página web en una estructura de datos que
-        # entienda python (listas anidadas con datos)    
+        # entienda python (diccionarios y listas anidados con datos)    
         texto_json = json.loads(texto_capturado)
         
-        #Me quedo únicamente con un sector de esa estructura que es donde están
-        #los datos del usuario de instagram
+        # Me quedo únicamente con un sector de esa estructura que es donde
+        # están los datos del usuario de instagram
         cuenta = texto_json['entry_data']['ProfilePage'][0]['graphql']['user']
         
         # Muestro los datos 
@@ -65,13 +64,18 @@ def obtengo_datos(pagina):
     else:      
         print("Existe la cuenta de instagram pero no se puede acceder a los "
             " datos por el momento")
+        
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
 
-    # Uso expresiones regulares para controlar el ingreso de caracteres válidos
-    patron_ingreso = re.compile(r'^[\w\.\@]+$')
-
+    '''Uso expresiones regulares para controlar el ingreso. Solamente
+    se pueden ingresar letras, números y guión bajo. No permito ingresar
+    dos puntos seguidos, ni empezar o terminar en punto y limito la entrada
+    de 1 a 30 caracteres.
+    '''
+    patron_ingreso = re.compile(r'^(?!.*\.\.)(?!.*\.$)\w[\w.]{0,29}$')
+    
     while True:
         
         ingreso = input("\nIngrese nombre de usuario de instagram (o pulse 0 "
@@ -102,4 +106,4 @@ if __name__ == "__main__":
                     print("No existe cuenta de instagram para el usuario "
                         "ingresado.")
         else:
-            print("Error. Alguno de los caracteres ingresados no son válidos.")
+            print("Error. Algunos de los caracteres ingresados no son válidos.")
